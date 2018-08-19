@@ -6,7 +6,7 @@
 /*   By: xlim <marvin@42.fr>                        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/17 15:56:09 by xlim              #+#    #+#             */
-/*   Updated: 2018/08/19 14:39:26 by xlim             ###   ########.fr       */
+/*   Updated: 2018/08/19 16:39:19 by xlim             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,18 +27,21 @@ int					ft_strlen_mod(char *str, int *index, int *len)
 	return (-1);
 }
 
-/*int					ft_searchlst(static t_list *alst, int key)
+int					ft_searchlst(t_list *alst, int key)
 {
+	int				*arr;
+
 	while (alst)
 	{
-		if (alst->content[0] == key)
-			return (alst->content[1]);
+		arr = (int *)(alst->content);
+		if (arr[0] == key)
+			return (arr[1]);
 		alst = alst->next;
 	}
 	return (-1);
-}*/
+}
 
-/*void				ft_lstadd_mod(static t_list **alst, int key, int value)
+void				ft_lstadd_mod(t_list **alst, int key, int value)
 {
 	int				*arr;
 	t_list			*ptr;
@@ -48,16 +51,21 @@ int					ft_strlen_mod(char *str, int *index, int *len)
 		arr = malloc(sizeof(int) * 2);
 		arr[0] = key;
 		arr[1] = value;
-		ft_lstadd(alst, ft_lstnew(arr, 2));
+		ft_lstadd(alst, ft_lstnew(arr, sizeof(int) * 2));
 	}
 	else
 	{
 		ptr = *alst;
-		while (ptr->content[0] != key)
+		arr = (int *)(ptr->content);
+		while (arr[0] != key)
+		{
 			ptr = ptr->next;
-		ptr->content[1] = value;
+			arr = (int *)(ptr->content);
+		}
+		arr = (int *)(ptr->content);
+		arr[1] = value;
 	}
-}*/
+}
 
 /*int					get_next_line(const int fd, char **line)
 {
