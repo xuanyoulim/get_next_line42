@@ -1,6 +1,7 @@
 #include "get_next_line.h"
 #include <assert.h>
 #include <stdio.h>
+#include <fcntl.h>
 
 void	printlist(t_list *list)
 {
@@ -13,7 +14,7 @@ void	printlist(t_list *list)
 	}
 }
 
-int main()
+/*int main()
 {
 	//test ft_strlen_mod
 	char test1str1[] = "abcde\n";
@@ -50,5 +51,25 @@ int main()
 	ft_lstadd_mod(&list, 5, 5);
 	printf("\n");
 	printlist(list);
+	return (0);
+}*/
+
+int main()
+{
+	int fd = open("test", O_RDONLY);
+	char *line;
+	//int status = 1;
+	//while(status)
+	//{
+	//	status = get_next_line(fd, &line);
+		//printf("%s\n", line);
+		//ft_strclr(line);
+	//}
+	while (get_next_line(fd, &line))
+	{
+		printf("%s\n", line);
+		ft_strclr(line);
+	}
+	ft_strdel(&line);
 	return (0);
 }
