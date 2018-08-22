@@ -6,7 +6,7 @@
 /*   By: xlim <marvin@42.fr>                        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/17 15:53:06 by xlim              #+#    #+#             */
-/*   Updated: 2018/08/21 18:32:06 by xlim             ###   ########.fr       */
+/*   Updated: 2018/08/22 15:00:33 by xlim             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,17 @@
 # include <stdlib.h>
 # include <libft.h>
 
-int		ft_strlen_mod(char *str, int *index, int *len);
-int		ft_searchlst(t_list *alst, int key, int isindex);
-void	ft_lstadd_mod(t_list **alst, int key, int value, int v2);
+typedef struct			s_listx
+{
+	char			*remain;
+	size_t			len;
+	int				key;
+	struct s_listx	*next;
+}					t_listx;
+
+t_listx				*ft_searchlst(t_listx *alst, int fd);
+void				ft_lstdel_mod(t_listx **alst, int fd);
+void				ft_lstadd_mod(t_listx **alst, int fd, char *s, size_t len);
 
 int		extract(char **base, char **extract, size_t *size);
 int		get_next_line(const int fd, char **line);

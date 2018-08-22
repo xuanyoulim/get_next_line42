@@ -6,13 +6,13 @@
 /*   By: xlim <marvin@42.fr>                        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/17 15:56:09 by xlim              #+#    #+#             */
-/*   Updated: 2018/08/21 18:31:18 by xlim             ###   ########.fr       */
+/*   Updated: 2018/08/22 15:03:19 by xlim             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdio.h>
-int					ft_strlen_mod(char *str, int *index, int *len)
+/*int					ft_strlen_mod(char *str, int *index, int *len)
 {
 	*len = 0;
 	if (*index == -1)
@@ -27,47 +27,66 @@ int					ft_strlen_mod(char *str, int *index, int *len)
 		(*index)++;
 	}
 	return (-1);
-}
+}*/
 
-int					ft_searchlst(t_list *alst, int key, int isindex)
+t_listx				*ft_searchlst(t_listx *alst, int fd)
 {
-	int				*arr;
-
 	while (alst)
 	{
-		arr = (int *)(alst->content);
-		if (arr[0] == key)
-			return (isindex) ? arr[2] : arr[1];
+		if (alst->key == fd)
+			return (alst);
 		alst = alst->next;
 	}
-	return (-1);
+	return (NULL);
 }
 
-void				ft_lstadd_mod(t_list **alst, int key, int value, int v2)
+void				ft_lstdel_mod(t_listx **alst, int fd)
 {
-	int				*arr;
-	t_list			*ptr;
+	t_listx			*ptr;
+	t_listx			*tmp;
 
-	if (ft_searchlst(*alst, key, v2) == -1)
+	ptr = *alst;
+	if (*alst && (*alst)->key == fd)
 	{
-		arr = malloc(sizeof(int) * 3);
-		arr[0] = key;
-		arr[1] = value;
-		arr[2] = v2;
-		ft_lstadd(alst, ft_lstnew(arr, sizeof(int) * 3));
+		ft_strdel(&((*alst)->remain));
+		tmp = *alst;
+		*alst = (*alst)->next;
+		free(tmp);
+	}
+	while (ptr && ptr->next)
+	{
+		if (ptr->next->key == fd)
+		{
+			ft_strdel(&(ptr->next->remain));
+			tmp = ptr->next;
+			ptr = ptr->next->next;
+			free(tmp);
+		}
+		else
+			ptr = ptr->next;
+	}
+}
+
+void				ft_lstadd_mod(t_listx **alst, int fd, char *s, size_t len)
+{
+	t_listx			*new;
+	t_listx			*ptr;
+
+	ptr = ft_searchlst(*alst, fd);
+	if (!ft_searchlst(*alst, fd))
+	{
+		new = malloc(sizeof(t_listx));
+		new->key = fd;
+		new->remain = malloc(sizeof(char) * len);
+		new->remain = s;
+		new->len = len;
+		new->next = *alst;
+		*alst = new;
 	}
 	else
 	{
-		ptr = *alst;
-		arr = (int *)(ptr->content);
-		while (arr[0] != key)
-		{
-			ptr = ptr->next;
-			arr = (int *)(ptr->content);
-		}
-		arr = (int *)(ptr->content);
-		arr[1] = value;
-		arr[2] = v2;
+		ft_lstdel_mod(alst, fd);
+		ft_lstadd_mod(alst, fd, s, len);
 	}
 }
 
