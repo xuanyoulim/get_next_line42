@@ -6,7 +6,7 @@
 /*   By: xlim <marvin@42.fr>                        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/17 15:53:06 by xlim              #+#    #+#             */
-/*   Updated: 2018/08/22 15:00:33 by xlim             ###   ########.fr       */
+/*   Updated: 2018/08/23 14:03:11 by xlim             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 # include <stdlib.h>
 # include <libft.h>
 
-typedef struct			s_listx
+typedef struct		s_listx
 {
 	char			*remain;
 	size_t			len;
@@ -29,9 +29,8 @@ typedef struct			s_listx
 
 t_listx				*ft_searchlst(t_listx *alst, int fd);
 void				ft_lstdel_mod(t_listx **alst, int fd);
-void				ft_lstadd_mod(t_listx **alst, int fd, char *s, size_t len);
-
-int		extract(char **base, char **extract, size_t *size);
-int		get_next_line(const int fd, char **line);
+t_listx				*ft_lstadd_mod(t_listx **alst, int fd, char *s, size_t len);
+int					extract(char **base, char **extract, size_t *size);
+int					get_next_line(const int fd, char **line);
 
 #endif

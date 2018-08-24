@@ -57,19 +57,40 @@ void	printlist(t_list *list)
 int main()
 {
 	int fd = open("test", O_RDONLY);
+	//int fd2 = open("test2", O_RDONLY);
 	char *line;
-	//int status = 1;
-	//while(status)
-	//{
-	//	status = get_next_line(fd, &line);
-		//printf("%s\n", line);
-		//ft_strclr(line);
-	//}
-	while (get_next_line(fd, &line))
+	/*while (get_next_line(fd, &line))
 	{
 		printf("%s\n", line);
 		ft_strclr(line);
-	}
+	}*/
+	//int status = 1;
+	//int status2 = 1;
+	/*while (status)
+	{
+		status = get_next_line(fd, &line);
+		printf("%s\n", line);
+		ft_strclr(line);
+		status2 = get_next_line(fd2, &line);
+		printf("%s\n", line);
+		ft_strclr(line);
+	}*/
+	get_next_line(fd, &line);
+	printf("%s", line);
+	ft_strclr(line);
+
+	/*get_next_line(fd2, &line);
+	printf("%s\n", line);
+	ft_strclr(line);
+	
+	get_next_line(fd, &line);
+	printf("%s\n", line);
+	ft_strclr(line);
+
+	get_next_line(fd2, &line);
+	printf("%s\n", line);
+	ft_strclr(line);*/
+
 	ft_strdel(&line);
 	return (0);
 }
