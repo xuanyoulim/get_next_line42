@@ -6,7 +6,7 @@
 /*   By: xlim <marvin@42.fr>                        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/17 15:56:09 by xlim              #+#    #+#             */
-/*   Updated: 2018/08/25 17:53:38 by xlim             ###   ########.fr       */
+/*   Updated: 2018/08/27 22:28:41 by xlim             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,37 +81,19 @@ int					extract(char **base, char **extract, size_t *size)
 {
 	size_t			i;
 	int				out;
-	char			*str;
+	char			*toextract;
 
 	i = 0;
-	str = *base;
-	while (i < *size && str[i] != '\0' && str[i] != '\n' && str[i] != -1)
+	while (*(*base + i) != '\0' && *(*base + i) != '\n' && *(*base + i) != -1)
 		i++;
-	if (str[i] == '\n' || str[i] == -1)
-		out = 1;
-	else if (i == *size)
-		out = -1;
-	else //(str[i] == '\0')
-		out = 0;
-	char *ptr1 = *extract;
-	if (!(*extract))
-		*extract = ft_strsub(*base, 0, i);
+	out = (i == *size) ? -1 : 1;
+	toextract = ft_strsub(*base, 0, i);
+	*extract = (!(*extract)) ? toextract : ft_strjoin(*extract, toextract);
+	*size = (*size == i) ? 0 : *size - ++i;
+	if (*size)
+		*base = ft_strsub(*base, i, *size);
 	else
-		*extract = ft_strjoin(*extract, ft_strsub(*base, 0, i));
-	ft_strclr(ptr1);
-	ft_strdel(&ptr1);
-	char *ptr2 = *base;
-	if (*size - i)
-		*base = ft_strsub(*base, ++i, *size);
-	//else
-	//	ft_strclr(*base);
-	ft_strclr(ptr2);
-	//ft_strdel(&ptr2);
-//	*size = *size - i;
-	if (*base)
-		*size = ft_strlen(*base);
-	else
-		*size = 0;
+		ft_strclr(*base);
 	return (out);
 }
 
@@ -129,37 +111,21 @@ int					get_next_line(const int fd, char **line)
 	status = -1;
 	curr = ft_searchlst(list, fd);
 	if (curr && curr->len)
-	{
-		if (*(curr->remain) == '\0' && curr->len == 1)
-		{
-			ft_lstdel_mod(&list, fd);
-			return (0);
-		}
 		status = extract(&(curr->remain), line, &(curr->len));
-	}
 	while (status < 0)
 	{
 		status = read(fd, buf, BUFF_SIZE);
-		if (status <= 0)
-			break ;
-		buf[status] = '\0';
-		len = BUFF_SIZE;
-		//len = ft_strlen(buf);
-		status = extract(&buf, line, &len);
-		if (status == 0)
+		if (status < 0)
+			return (-1);
+		else if (status == 0)
 		{
-			ft_lstadd_mod(&list, fd, "\0", 1);
-			return (1);
+			ft_lstdel_mod(&list, fd);
+			break ;
 		}
-		else
-			ft_lstadd_mod(&list, fd, buf, len);
+		len = status;
+		status = extract(&buf, line, &len);
+		ft_lstadd_mod(&list, fd, buf, len);
 	}
-	//if (status == 0)
-	//{
-	//	ft_lstadd_mod(&list, fd, "", 1);
-	//	return (1);
-	//	ft_lstdel_mod(&list, fd);
-	//}
 	free(buf);
-	return (status);
+	return (**line) ? 1 : status;
 }
