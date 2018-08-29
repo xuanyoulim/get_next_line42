@@ -6,7 +6,7 @@
 /*   By: xlim <marvin@42.fr>                        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/17 15:56:09 by xlim              #+#    #+#             */
-/*   Updated: 2018/08/27 22:28:41 by xlim             ###   ########.fr       */
+/*   Updated: 2018/08/29 15:35:40 by xlim             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ t_listx				*ft_lstadd_mod(t_listx **alst, int fd, char *s, size_t len)
 	{
 		new = malloc(sizeof(t_listx));
 		new->key = fd;
-		new->remain = malloc(sizeof(char) * len);
+		new->remain = ft_memalloc(sizeof(char) * (len + 1));
 		ft_strcpy(new->remain, s);
 		new->len = len;
 		new->next = *alst;
@@ -70,7 +70,7 @@ t_listx				*ft_lstadd_mod(t_listx **alst, int fd, char *s, size_t len)
 	else
 	{
 		free(ptr->remain);
-		ptr->remain = malloc(sizeof(char) * len);
+		ptr->remain = ft_memalloc(sizeof(char) * (len + 1));
 		ft_strcpy(ptr->remain, s);
 		ptr->len = len;
 	}
@@ -82,18 +82,37 @@ int					extract(char **base, char **extract, size_t *size)
 	size_t			i;
 	int				out;
 	char			*toextract;
+	char			*tofree;
 
 	i = 0;
 	while (*(*base + i) != '\0' && *(*base + i) != '\n' && *(*base + i) != -1)
 		i++;
 	out = (i == *size) ? -1 : 1;
 	toextract = ft_strsub(*base, 0, i);
-	*extract = (!(*extract)) ? toextract : ft_strjoin(*extract, toextract);
+	if (*extract && **extract != '\0')
+	{
+		tofree = *extract;
+		*extract = ft_strjoin(*extract, toextract);
+		ft_strdel(&tofree);
+	}
+	else
+	{
+		*extract = ft_strnew(ft_strlen(toextract));
+		ft_strcpy(*extract, toextract);
+	}
+	ft_strdel(&toextract);
 	*size = (*size == i) ? 0 : *size - ++i;
 	if (*size)
-		*base = ft_strsub(*base, i, *size);
+	{
+		tofree = ft_strsub(*base, i, *size);
+		ft_strdel(base);
+		*base = ft_strnew(ft_strlen(tofree));
+		ft_strcpy(*base, tofree);
+		ft_strdel(&tofree);
+	}
 	else
 		ft_strclr(*base);
+	ft_strdel(&tofree);
 	return (out);
 }
 
@@ -105,9 +124,13 @@ int					get_next_line(const int fd, char **line)
 	int				status;
 	size_t			len;
 
-	if (*line)
-		ft_strclr(*line);
-	buf = malloc(sizeof(char) * (BUFF_SIZE + 1));
+	buf = ft_memalloc(sizeof(char) * (BUFF_SIZE + 1));
+	if (line == NULL || read(fd, buf, 0) < 0 || fd < 0)
+	{
+		ft_strdel(&buf);
+		return (-1);
+	}
+	*line = ft_strnew(0);
 	status = -1;
 	curr = ft_searchlst(list, fd);
 	if (curr && curr->len)
@@ -115,9 +138,7 @@ int					get_next_line(const int fd, char **line)
 	while (status < 0)
 	{
 		status = read(fd, buf, BUFF_SIZE);
-		if (status < 0)
-			return (-1);
-		else if (status == 0)
+		if (status == 0)
 		{
 			ft_lstdel_mod(&list, fd);
 			break ;
@@ -126,6 +147,6 @@ int					get_next_line(const int fd, char **line)
 		status = extract(&buf, line, &len);
 		ft_lstadd_mod(&list, fd, buf, len);
 	}
-	free(buf);
-	return (**line) ? 1 : status;
+	ft_strdel(&buf);
+	return (*line && **line != '\0') ? 1 : status;
 }
