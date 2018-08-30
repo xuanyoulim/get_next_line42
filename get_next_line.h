@@ -6,13 +6,14 @@
 /*   By: xlim <marvin@42.fr>                        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/17 15:53:06 by xlim              #+#    #+#             */
-/*   Updated: 2018/08/29 15:37:03 by xlim             ###   ########.fr       */
+/*   Updated: 2018/08/29 23:33:15 by xlim             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 # define BUFF_SIZE 1
+# define TRANSLATE(x) ((x == 2) ? -1 : x)
 # include <sys/types.h>
 # include <sys/uio.h>
 # include <unistd.h>

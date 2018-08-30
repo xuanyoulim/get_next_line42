@@ -6,7 +6,7 @@
 /*   By: xlim <marvin@42.fr>                        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/17 15:56:09 by xlim              #+#    #+#             */
-/*   Updated: 2018/08/29 15:35:40 by xlim             ###   ########.fr       */
+/*   Updated: 2018/08/29 23:21:16 by xlim             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,38 +77,28 @@ t_listx				*ft_lstadd_mod(t_listx **alst, int fd, char *s, size_t len)
 	return (NULL);
 }
 
-int					extract(char **base, char **extract, size_t *size)
+int					extract(char **base, char **ret, size_t *size)
 {
 	size_t			i;
 	int				out;
-	char			*toextract;
+	char			*tmp;
 	char			*tofree;
 
 	i = 0;
 	while (*(*base + i) != '\0' && *(*base + i) != '\n' && *(*base + i) != -1)
 		i++;
 	out = (i == *size) ? -1 : 1;
-	toextract = ft_strsub(*base, 0, i);
-	if (*extract && **extract != '\0')
-	{
-		tofree = *extract;
-		*extract = ft_strjoin(*extract, toextract);
-		ft_strdel(&tofree);
-	}
-	else
-	{
-		*extract = ft_strnew(ft_strlen(toextract));
-		ft_strcpy(*extract, toextract);
-	}
-	ft_strdel(&toextract);
+	tmp = ft_strsub(*base, 0, i);
+	tofree = *ret;
+	*ret = (*ret && **ret != '\0') ? ft_strjoin(*ret, tmp) : ft_strdup(tmp);
+	ft_strdel(&tmp);
+	ft_strdel(&tofree);
 	*size = (*size == i) ? 0 : *size - ++i;
 	if (*size)
 	{
 		tofree = ft_strsub(*base, i, *size);
 		ft_strdel(base);
-		*base = ft_strnew(ft_strlen(tofree));
-		ft_strcpy(*base, tofree);
-		ft_strdel(&tofree);
+		*base = ft_strdup(tofree);
 	}
 	else
 		ft_strclr(*base);
@@ -119,34 +109,28 @@ int					extract(char **base, char **extract, size_t *size)
 int					get_next_line(const int fd, char **line)
 {
 	static t_listx	*list;
-	t_listx			*curr;
+	t_listx			*cur;
 	char			*buf;
-	int				status;
+	int				state;
 	size_t			len;
 
 	buf = ft_memalloc(sizeof(char) * (BUFF_SIZE + 1));
 	if (line == NULL || read(fd, buf, 0) < 0 || fd < 0)
+		state = 2;
+	else
+		*line = ft_strnew(0);
+	cur = ft_searchlst(list, fd);
+	state = (cur && cur->len) ? extract(&(cur->remain), line, &(cur->len)) : -1;
+	while (state < 0)
 	{
-		ft_strdel(&buf);
-		return (-1);
-	}
-	*line = ft_strnew(0);
-	status = -1;
-	curr = ft_searchlst(list, fd);
-	if (curr && curr->len)
-		status = extract(&(curr->remain), line, &(curr->len));
-	while (status < 0)
-	{
-		status = read(fd, buf, BUFF_SIZE);
-		if (status == 0)
-		{
-			ft_lstdel_mod(&list, fd);
+		if ((state = read(fd, buf, BUFF_SIZE)) <= 0)
 			break ;
-		}
-		len = status;
-		status = extract(&buf, line, &len);
+		len = state;
+		state = extract(&buf, line, &len);
 		ft_lstadd_mod(&list, fd, buf, len);
 	}
+	if (state == 0)
+		ft_lstdel_mod(&list, fd);
 	ft_strdel(&buf);
-	return (*line && **line != '\0') ? 1 : status;
+	return (line != NULL && *line && **line != '\0') ? 1 : TRANSLATE(state);
 }
